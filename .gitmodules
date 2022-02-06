@@ -1,0 +1,6 @@
+[submodule "dependencies/uicore"]
+	path = dependencies/uicore
+	url = https://github.com/RadicalProcess/uicore
+[submodule "dependencies/JUCE"]
+	path = dependencies/JUCE
+	url = https://github.com/juce-framework/JUCE.git
