@@ -36,13 +36,13 @@ jobs:
         run: cmake -G "Visual Studio 16 2019" -A x64 -B ${{github.workspace}}/build -DCMAKE_CONFIGURATION_TYPES=Release -DPRODUCT_VERSION="${{env.VERSION}}"
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --target curtis_All ${{env.PRODUCT_NAME}}CoreTestHost --config Release
+        run: cmake --build ${{github.workspace}}/build --target ${{env.PRODUCT_NAME}}_All ${{env.PRODUCT_NAME}}CoreTestHost --config Release
 
       - name: Upload Plugins
         uses: actions/upload-artifact@v2
         with:
           name: unsigned_plugins
-          path: bin/**/curtis.*
+          path: bin/**/${{env.PRODUCT_NAME}}.*
 
       - name: Upload Test executables
         uses: actions/upload-artifact@v2
@@ -92,38 +92,38 @@ jobs:
 
       - name: Sign plugins
         run: |
-          /usr/bin/codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" ${{github.workspace}}/bin/Mac/curtis.vst3 -v
-          /usr/bin/codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" ${{github.workspace}}/bin/Mac/curtis.component -v
+          /usr/bin/codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.vst3 -v
+          /usr/bin/codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.component -v
 
       - name: Notarize VST3
         uses: devbotsxyz/xcode-notarize@v1
         with:
-          product-path: ${{github.workspace}}/bin/Mac/curtis.vst3
+          product-path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.vst3
           appstore-connect-username: ${{ secrets.APPLE_STORE_CONNECT_USERNAME }}
           appstore-connect-password: ${{ secrets.APPLE_STORE_CONNECT_PWD }}
 
       - name: Staple VST3
         uses: devbotsxyz/xcode-staple@v1
         with:
-          product-path: ${{github.workspace}}/bin/Mac/curtis.vst3
+          product-path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.vst3
 
       - name: Notarize AU
         uses: devbotsxyz/xcode-notarize@v1
         with:
-          product-path: ${{github.workspace}}/bin/Mac/curtis.component
+          product-path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.component
           appstore-connect-username: ${{ secrets.APPLE_STORE_CONNECT_USERNAME}}
           appstore-connect-password: ${{ secrets.APPLE_STORE_CONNECT_PWD }}
 
       - name: Staple AU
         uses: devbotsxyz/xcode-staple@v1
         with:
-          product-path: ${{github.workspace}}/bin/Mac/curtis.component
+          product-path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.component
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: signed-plugins-mac
-          path: ${{github.workspace}}/bin/Mac/curtis.*
+          path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.*
 
   setup-mac:
     name: Setup Mac
@@ -149,17 +149,17 @@ jobs:
         run: |
           mkdir -p bin/mac/packages
           echo "Creating  installer... "
-          pkgbuild --version ${{env.VERSION}} --component "bin/Mac/curtis.vst3" --identifier "com.radical-process.curtisVst3"  --install-location "/Library/Audio/Plug-Ins/VST3" bin/Mac/packages/curtisVst3.pkg
-          pkgbuild --version ${{env.VERSION}} --component "bin/Mac/curtis.component" --identifier "com.radical-process.curtisAU" --install-location "/Library/Audio/Plug-Ins/Components" bin/Mac/packages/curtisAU.pkg
-          productBuild --distribution "setup/Mac/distribution.plist" --version "$version" --package-path bin/Mac/packages --resources "setup/Mac/resources" bin/Mac/curtis_unsigned.pkg
+          pkgbuild --version ${{env.VERSION}} --component "bin/Mac/${{env.PRODUCT_NAME}}.vst3" --identifier "com.radical-process.${{env.PRODUCT_NAME}}Vst3"  --install-location "/Library/Audio/Plug-Ins/VST3" bin/Mac/packages/${{env.PRODUCT_NAME}}Vst3.pkg
+          pkgbuild --version ${{env.VERSION}} --component "bin/Mac/${{env.PRODUCT_NAME}}.component" --identifier "com.radical-process.${{env.PRODUCT_NAME}}AU" --install-location "/Library/Audio/Plug-Ins/Components" bin/Mac/packages/${{env.PRODUCT_NAME}}AU.pkg
+          productBuild --distribution "setup/Mac/distribution.plist" --version "$version" --package-path bin/Mac/packages --resources "setup/Mac/resources" bin/Mac/${{env.PRODUCT_NAME}}_unsigned.pkg
           echo "Sign installer"
-          productsign --sign "${{ secrets.DEVELOPER_ID_INSTALLER }}" bin/Mac/curtis_unsigned.pkg bin/Mac/curtis.pkg
+          productsign --sign "${{ secrets.DEVELOPER_ID_INSTALLER }}" bin/Mac/${{env.PRODUCT_NAME}}_unsigned.pkg bin/Mac/${{env.PRODUCT_NAME}}.pkg
           rm -rf bin/mac/packages
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: curtis-mac
-          path: ${{github.workspace}}/bin/Mac/curtis.pkg
+          name: ${{env.PRODUCT_NAME}}-mac
+          path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.pkg
 
   test_win:
     needs: build
@@ -199,8 +199,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: curtis-win
-          path: ${{github.workspace}}/bin/Win/curtis.msi
+          name: ${{env.PRODUCT_NAME}}-win
+          path: ${{github.workspace}}/bin/Win/${{env.PRODUCT_NAME}}.msi
 
   add-documents-to-packages:
     name: Adding documents to packages
@@ -213,12 +213,12 @@ jobs:
       - name: Archive Documents in Win package
         uses: actions/upload-artifact@v2
         with:
-          name: curtis-win
+          name: ${{env.PRODUCT_NAME}}-win
           path: docs
 
       - name: Archive Documents in Mac package
         uses: actions/upload-artifact@v2
         with:
-          name: curtis-mac
+          name: ${{env.PRODUCT_NAME}}-mac
           path: docs
 
