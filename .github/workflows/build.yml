@@ -1,4 +1,4 @@
-name: Template Release Build
+name: Release Build
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
       - 'test*'
 env:
   VERSION: 1.0.0
-
+  PRODUCT_NAME: template
 jobs:
   build:
     name: Build
@@ -36,7 +36,7 @@ jobs:
         run: cmake -G "Visual Studio 16 2019" -A x64 -B ${{github.workspace}}/build -DCMAKE_CONFIGURATION_TYPES=Release -DPRODUCT_VERSION="${{env.VERSION}}"
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --target curtis_All TemplateCoreTestHost --config Release
+        run: cmake --build ${{github.workspace}}/build --target curtis_All ${{env.PRODUCT_NAME}}CoreTestHost --config Release
 
       - name: Upload Plugins
         uses: actions/upload-artifact@v2
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: test_executables
-          path: bin/**/TemplateCoreTestHost*
+          path: bin/**/${{env.PRODUCT_NAME}}CoreTestHost*
 
   test_mac:
     needs: build
@@ -68,8 +68,8 @@ jobs:
       - name: Run Test
         working-directory: Mac
         run: |
-          chmod 755 TemplateCoreTestHost
-          ./TemplateCoreTestHost
+          chmod 755 ${{env.PRODUCT_NAME}}CoreTestHost
+          ./${{env.PRODUCT_NAME}}CoreTestHost
 
   sign_and_notarize_mac:
     name: Sign and Notarize
@@ -174,7 +174,7 @@ jobs:
 
       - name: Run Test
         working-directory: Win
-        run: Start-Process -FilePath "TemplateCoreTestHost.exe"
+        run: Start-Process -FilePath "${{env.PRODUCT_NAME}}CoreTestHost.exe"
 
   setup-win:
     name: Setup Win
