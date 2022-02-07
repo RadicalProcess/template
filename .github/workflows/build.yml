@@ -50,26 +50,26 @@ jobs:
           name: test_executables
           path: bin/**/${{env.PRODUCT_NAME}}CoreTestHost*
 
-  test_mac:
-    needs: build
-    name: Run unit tests
-    runs-on: macos-10.15
-
-    steps:
-      - name: Download
-        uses: actions/download-artifact@v2
-        with:
-          name: test_executables
-          path: ${{github.workspace}}
-
-      - name: Display contents of downloaded artifacts
-        run: ls -Rl
-
-      - name: Run Test
-        working-directory: Mac
-        run: |
-          chmod 755 ${{env.PRODUCT_NAME}}CoreTestHost
-          ./${{env.PRODUCT_NAME}}CoreTestHost
+#  test_mac:
+#    needs: build
+#    name: Run unit tests
+#    runs-on: macos-10.15
+#
+#    steps:
+#      - name: Download
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: test_executables
+#          path: ${{github.workspace}}
+#
+#      - name: Display contents of downloaded artifacts
+#        run: ls -Rl
+#
+#      - name: Run Test
+#        working-directory: Mac
+#        run: |
+#          chmod 755 ${{env.PRODUCT_NAME}}CoreTestHost
+#          ./${{env.PRODUCT_NAME}}CoreTestHost
 
   sign_and_notarize_mac:
     name: Sign and Notarize
@@ -161,20 +161,20 @@ jobs:
           name: ${{env.PRODUCT_NAME}}-mac
           path: ${{github.workspace}}/bin/Mac/${{env.PRODUCT_NAME}}.pkg
 
-  test_win:
-    needs: build
-    name: Run unit tests
-    runs-on: windows-latest
-
-    steps:
-      - name: Download
-        uses: actions/download-artifact@v2
-        with:
-          name: test_executables
-
-      - name: Run Test
-        working-directory: Win
-        run: Start-Process -FilePath "${{env.PRODUCT_NAME}}CoreTestHost.exe"
+#  test_win:
+#    needs: build
+#    name: Run unit tests
+#    runs-on: windows-latest
+#
+#    steps:
+#      - name: Download
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: test_executables
+#
+#      - name: Run Test
+#        working-directory: Win
+#        run: Start-Process -FilePath "${{env.PRODUCT_NAME}}CoreTestHost.exe"
 
   setup-win:
     name: Setup Win
